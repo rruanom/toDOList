@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 import { v4 as uuidv4 } from 'uuid';
 import data from './data'
 import List from './List'
@@ -9,12 +9,20 @@ const Main = () => {
     desc: '',
     isDone: false
   });
+  let timer;
   const handleChange = (e) => {
+    clearTimeout(timer);
+    timer
     setValues({
         ...values,
         [e.target.name]: e.target.value
     })
   }
+  const form = useRef();
+  timer = setTimeout(()=>{
+      console.log("entrando");
+      form.current.reset()
+  }, 5000);
   const clearItems = () => setItems([]);
   const resetItems = () => setItems(data);
   const handleSubmit=(e)=>{
@@ -23,13 +31,19 @@ const Main = () => {
     const desc = e.target.desc.value;
     const isDone= false;
     const newItem = {title,desc,isDone}
-    setItems([...items, newItem])
+    setItems([newItem, ...items])
+    form.current.reset();
+    setValues({
+      ...values,
+      title: '',
+      desc: ''
+  })
   }
   return (
     <section>
       <button onClick={clearItems}>Borrar todo</button>
       <button onClick={resetItems}>Recargar</button>
-      <form onSubmit={handleSubmit} className="form">
+      <form ref={form} onSubmit={handleSubmit} className="form">
         <div>
           <label htmlFor="title">Tarea</label>
           <input type="text" name="title" onChange={handleChange} />
